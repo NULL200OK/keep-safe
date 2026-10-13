@@ -92,7 +92,10 @@ abstract class ThreatDatabase : RoomDatabase() {
                     context.applicationContext,
                     ThreatDatabase::class.java,
                     "keep_safe.db"
-                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }
