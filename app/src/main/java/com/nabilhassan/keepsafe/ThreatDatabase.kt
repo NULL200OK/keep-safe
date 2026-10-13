@@ -7,21 +7,45 @@ import kotlinx.coroutines.runBlocking
 
 @Entity(tableName = "malicious_urls")
 data class MaliciousUrl(
-    @PrimaryKey val url: String,
+    @PrimaryKey
+    @ColumnInfo(name = "url")
+    val url: String,
+
+    @ColumnInfo(name = "domain")
     val domain: String?,
+
+    @ColumnInfo(name = "source")
     val source: String,
+
+    @ColumnInfo(name = "threat_type")
     val threatType: String = "phishing"
 )
 
 @Entity(tableName = "scan_history")
 data class ScanHistory(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Long = 0,
+
+    @ColumnInfo(name = "url")
     val url: String,
+
+    @ColumnInfo(name = "host")
     val host: String,
+
+    @ColumnInfo(name = "score")
     val score: Int,
+
+    @ColumnInfo(name = "verdict_ar")
     val verdictAr: String,
+
+    @ColumnInfo(name = "verdict_en")
     val verdictEn: String,
+
+    @ColumnInfo(name = "scan_type")
     val scanType: String = "URL",
+
+    @ColumnInfo(name = "scanned_at")
     val scannedAt: Long = System.currentTimeMillis()
 )
 
@@ -36,6 +60,7 @@ interface ThreatDao {
 
 @Dao
 interface ScanHistoryDao {
+
     @Query("SELECT * FROM scan_history ORDER BY scanned_at DESC")
     fun getAll(): Flow<List<ScanHistory>>
 
@@ -76,6 +101,7 @@ interface ScanHistoryDao {
     exportSchema = false
 )
 abstract class ThreatDatabase : RoomDatabase() {
+
     abstract fun threatDao(): ThreatDao
     abstract fun scanHistoryDao(): ScanHistoryDao
 
@@ -84,7 +110,8 @@ abstract class ThreatDatabase : RoomDatabase() {
     }
 
     companion object {
-        @Volatile private var INSTANCE: ThreatDatabase? = null
+        @Volatile
+        private var INSTANCE: ThreatDatabase? = null
 
         fun getInstance(context: Context): ThreatDatabase {
             return INSTANCE ?: synchronized(this) {
