@@ -10,9 +10,7 @@ import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -81,15 +79,12 @@ private fun AppRoot(
 ) {
     var showCustomSplash by remember { mutableStateOf(true) }
     var showWelcome by remember { mutableStateOf(false) }
-    var isUnlocked by remember {
-        mutableStateOf(!BiometricAuth.isEnabled(activity))
-    }
+    var isUnlocked by remember { mutableStateOf(!BiometricAuth.isEnabled(activity)) }
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAbout by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    // ---- شاشة Splash ----
     AnimatedVisibility(
         visible = showCustomSplash,
         enter = fadeIn(),
@@ -103,24 +98,20 @@ private fun AppRoot(
 
     if (showCustomSplash) return
 
-    // ---- بوابة البصمة ----
     if (!isUnlocked) {
         BiometricGate(activity = activity) { isUnlocked = true }
         return
     }
 
-    // ---- رسالة الترحيب ----
     if (showWelcome) {
         WelcomeDialog(onDismiss = { showWelcome = false })
     }
 
-    // ---- صفحة عن التطبيق ----
     if (showAbout) {
         AboutScreen(onBack = { showAbout = false })
         return
     }
 
-    // ---- الهيكل الرئيسي ----
     Scaffold(
         bottomBar = {
             ScrollableTabRow(
@@ -223,27 +214,27 @@ private fun BiometricGate(activity: FragmentActivity, onUnlocked: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(Icons.Filled.Fingerprint, contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(96.dp))
-        Spacer(Modifier.size(20.dp))
+        Spacer(Modifier.height(20.dp))
         Text("التطبيق مقفل", fontSize = 22.sp, fontWeight = FontWeight.Bold)
         Text("App is locked", fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
-        Spacer(Modifier.size(24.dp))
+        Spacer(Modifier.height(24.dp))
         Button(onClick = {
             BiometricAuth.authenticate(activity,
                 onSuccess = { onUnlocked() },
                 onFailure = { errorMsg = it })
         }) {
             Icon(Icons.Filled.Fingerprint, contentDescription = null)
-            Spacer(Modifier.size(8.dp))
+            Spacer(Modifier.width(8.dp))
             Text("المحاولة مجددًا | Retry")
         }
         errorMsg?.let {
-            Spacer(Modifier.size(16.dp))
+            Spacer(Modifier.height(16.dp))
             Text(it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
         }
     }
