@@ -2,8 +2,6 @@ package com.nabilhassan.keepsafe.settings
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatDelegate
-import java.util.Locale
 
 enum class AppLanguage(val code: String, val displayAr: String, val displayEn: String) {
     ARABIC("ar", "العربية", "Arabic"),
@@ -32,16 +30,18 @@ object SettingsManager {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     fun getTheme(context: Context): AppTheme =
-        try { AppTheme.valueOf(prefs(context).getString(KEY_THEME, "SYSTEM") ?: "SYSTEM") }
-        catch (e: Exception) { AppTheme.SYSTEM }
+        try {
+            AppTheme.valueOf(prefs(context).getString(KEY_THEME, "SYSTEM") ?: "SYSTEM")
+        } catch (e: Exception) { AppTheme.SYSTEM }
 
     fun setTheme(context: Context, theme: AppTheme) {
         prefs(context).edit().putString(KEY_THEME, theme.name).apply()
     }
 
     fun getLanguage(context: Context): AppLanguage =
-        try { AppLanguage.valueOf(prefs(context).getString(KEY_LANGUAGE, "SYSTEM") ?: "SYSTEM") }
-        catch (e: Exception) { AppLanguage.SYSTEM }
+        try {
+            AppLanguage.valueOf(prefs(context).getString(KEY_LANGUAGE, "SYSTEM") ?: "SYSTEM")
+        } catch (e: Exception) { AppLanguage.SYSTEM }
 
     fun setLanguage(context: Context, language: AppLanguage) {
         prefs(context).edit().putString(KEY_LANGUAGE, language.name).apply()
