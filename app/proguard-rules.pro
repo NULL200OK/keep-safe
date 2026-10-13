@@ -1,0 +1,4 @@
+-keep class com.nabilhassan.keepsafe.** { *; }
+-keep class androidx.room.** { *; }
+-keep class com.journeyapps.barcodescanner.** { *; }
+-dontwarn java.lang.management.**
