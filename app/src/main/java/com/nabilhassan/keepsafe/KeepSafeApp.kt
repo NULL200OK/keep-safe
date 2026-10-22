@@ -4,12 +4,17 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.nabilhassan.keepsafe.family.BlockLog
+import com.nabilhassan.keepsafe.family.FamilySettings
 import com.nabilhassan.keepsafe.workers.WorkScheduler
 
 class KeepSafeApp : Application() {
     override fun onCreate() {
         super.onCreate()
+        FamilySettings.init(this)
+        BlockLog.init(this)
         createChannels()
+        WorkScheduler.scheduleWeeklyReport(this)
         WorkScheduler.scheduleThreatFeedUpdate(this)
         WorkScheduler.scheduleDailySummary(this)
     }

@@ -50,7 +50,7 @@ fun HistoryScreen(dao: ScanHistoryDao, onBack: () -> Unit) {
                         else -> SafeGreen
                     }
                     Card(shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = Surface)) {
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                         Row(Modifier.padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically) {
                             Text("${item.score}", fontSize = 22.sp,

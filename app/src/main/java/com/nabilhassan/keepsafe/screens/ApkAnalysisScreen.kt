@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nabilhassan.keepsafe.ui.theme.Surface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -76,7 +75,7 @@ fun ApkAnalysisScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(20.dp))
             Card(modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface)) {
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(Modifier.padding(16.dp)) {
                     Text("الملف | File: $name", fontSize = 14.sp)
                     Spacer(Modifier.height(6.dp))

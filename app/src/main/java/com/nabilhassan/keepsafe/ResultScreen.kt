@@ -63,7 +63,7 @@ fun ResultScreen(report: UrlReport, onBack: () -> Unit) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Surface)
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(Modifier.padding(12.dp)) {
                         Text(ar, fontSize = 14.sp, fontWeight = FontWeight.Medium,
@@ -83,7 +83,7 @@ private fun InfoCard(label: String, value: String) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(Modifier.padding(14.dp)) {
             Text(label, fontSize = 12.sp,

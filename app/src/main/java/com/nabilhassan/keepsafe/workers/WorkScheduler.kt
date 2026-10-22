@@ -16,6 +16,15 @@ object WorkScheduler {
         )
     }
 
+    fun scheduleWeeklyReport(context: Context) {
+        val req = PeriodicWorkRequestBuilder<WeeklyReportWorker>(
+            7, java.util.concurrent.TimeUnit.DAYS
+        ).build()
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "weekly_report", ExistingPeriodicWorkPolicy.KEEP, req
+        )
+    }
+
     fun scheduleDailySummary(context: Context) {
         val req = PeriodicWorkRequestBuilder<DailySummaryWorker>(
             24, java.util.concurrent.TimeUnit.HOURS

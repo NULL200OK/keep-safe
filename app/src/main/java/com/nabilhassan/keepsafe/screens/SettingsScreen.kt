@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nabilhassan.keepsafe.family.FamilySettings
 import com.nabilhassan.keepsafe.security.BiometricAuth
 import com.nabilhassan.keepsafe.settings.*
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,7 @@ fun SettingsScreen(
     var currentLang by remember { mutableStateOf(SettingsManager.getLanguage(context)) }
     var notifications by remember { mutableStateOf(SettingsManager.isNotificationsEnabled(context)) }
     var autoUpdate by remember { mutableStateOf(SettingsManager.isAutoUpdateEnabled(context)) }
+    var beginner by remember { mutableStateOf(FamilySettings.beginnerMode) }
     var biometric by remember { mutableStateOf(BiometricAuth.isEnabled(context)) }
 
     var showThemeDialog by remember { mutableStateOf(false) }
@@ -82,6 +84,10 @@ fun SettingsScreen(
         }
 
         SettingsHeader("عام | General")
+        SettingsSwitch(Icons.Filled.Spa, "الواجهة المبسّطة", "Simple mode", beginner) {
+            beginner = it
+            FamilySettings.beginnerMode = it
+        }
         SettingsItem(Icons.Filled.Info, "عن التطبيق", "About", "") { onOpenAbout() }
     }
 

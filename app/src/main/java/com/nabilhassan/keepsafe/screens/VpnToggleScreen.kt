@@ -1,6 +1,7 @@
 package com.nabilhassan.keepsafe.screens
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.VpnService
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,24 +19,57 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nabilhassan.keepsafe.security.PinGuard
+import com.nabilhassan.keepsafe.security.PinGuardDialog
+import com.nabilhassan.keepsafe.security.rememberPinGuard
 import com.nabilhassan.keepsafe.services.TrafficScannerVpnService
-import com.nabilhassan.keepsafe.ui.theme.SafeGreen
+
+/** Starts/stops the protection VPN, asking for the system consent and the PIN when needed. */
+class VpnController(
+    private val context: Context,
+    private val requestConsent: (Intent) -> Unit,
+    val guard: PinGuard
+) {
+    fun startService() {
+        context.startService(Intent(context, TrafficScannerVpnService::class.java)
+            .setAction(TrafficScannerVpnService.ACTION_START))
+    }
+
+    fun start() {
+        val intent = VpnService.prepare(context)
+        if (intent != null) requestConsent(intent) else startService()
+    }
+
+    fun stop() = guard.run {
+        context.startService(Intent(context, TrafficScannerVpnService::class.java)
+            .setAction(TrafficScannerVpnService.ACTION_STOP))
+    }
+
+    fun set(on: Boolean) = if (on) start() else stop()
+}
+
+@Composable
+fun rememberVpnController(): VpnController {
+    val context = LocalContext.current
+    val guard = rememberPinGuard()
+    var controller by remember { mutableStateOf<VpnController?>(null) }
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) controller?.startService()
+    }
+    val c = remember { VpnController(context, { launcher.launch(it) }, guard) }
+    controller = c
+    PinGuardDialog(guard)
+    return c
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VpnToggleScreen(onBack: () -> Unit) {
-    val context = LocalContext.current
-    var enabled by remember { mutableStateOf(false) }
-
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            context.startService(Intent(context, TrafficScannerVpnService::class.java)
-                .setAction(TrafficScannerVpnService.ACTION_START))
-            enabled = true
-        }
-    }
+    val enabled by TrafficScannerVpnService.running.collectAsStateWithLifecycle()
+    val vpn = rememberVpnController()
 
     Column(Modifier.fillMaxSize().padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
@@ -49,34 +83,23 @@ fun VpnToggleScreen(onBack: () -> Unit) {
         Card(modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (enabled) SafeGreen.copy(alpha = 0.15f)
-                else MaterialTheme.colorScheme.surface)) {
+                containerColor = if (enabled) MaterialTheme.colorScheme.tertiary.copy(alpha = 0.18f)
+                else MaterialTheme.colorScheme.surfaceVariant)) {
             Column(Modifier.padding(24.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(Icons.Filled.Shield, contentDescription = null,
-                    tint = if (enabled) SafeGreen else MaterialTheme.colorScheme.primary,
+                    tint = if (enabled) MaterialTheme.colorScheme.tertiary
+                    else MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(72.dp))
                 Spacer(Modifier.height(16.dp))
                 Text(if (enabled) "الحماية مُفعّلة" else "الحماية مُعطّلة",
                     fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(8.dp))
+                Text("يحجب النطاقات الخبيثة عبر DNS دون التأثير على سرعة الإنترنت",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(24.dp))
-                Switch(checked = enabled, onCheckedChange = { on ->
-                    if (on) {
-                        val intent = VpnService.prepare(context)
-                        if (intent != null) launcher.launch(intent)
-                        else {
-                            context.startService(Intent(context,
-                                TrafficScannerVpnService::class.java)
-                                .setAction(TrafficScannerVpnService.ACTION_START))
-                            enabled = true
-                        }
-                    } else {
-                        context.startService(Intent(context,
-                            TrafficScannerVpnService::class.java)
-                            .setAction(TrafficScannerVpnService.ACTION_STOP))
-                        enabled = false
-                    }
-                })
+                Switch(checked = enabled, onCheckedChange = { vpn.set(it) })
             }
         }
     }
